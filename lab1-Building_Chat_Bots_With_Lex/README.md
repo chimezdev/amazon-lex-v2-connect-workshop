@@ -11,88 +11,73 @@ Amazon Lex is a service for building conversational interfaces into any applicat
 - Adding slot types
 - Using AWS Lambda as the back-end logic for Lex
 
-# Step 1: Create the bot
+# Step 1a: Create the bot
 
 1. Log in to the [AWS console](https://console.aws.amazon.com/lex/home) and navigate to the Amazon Lex service
+2. check the url, you will see 'lexv2' as part of the url if you are in the V2 console
 2. **Please ensure you have selected North Virginia as the region in the top right (Amazon Connect is not available in all regions yet)**
-3. If you have never created a bot, click &quot;Get Started&quot;
-4. Choose &quot;Custom bot&quot;, which will display a dialog asking you to defined your bot
-5. Our bot name will be &quot;PersonalBanker&quot;
-6. Choose your preferred output voice
+3. If you have never created a bot, click &quot;Create bot&quot; and you will be presented with the following screen.
+![Create bot screen](./images/create-bot.png)
+4. select &quot;Create a blank bot&quot;, give it a name and an optional description
+5. under "IAM permissions" select &quot;Create a role with basic...&quot;
+6. Choose &quot;No&quot; to the Children&#39;s Online Privacy Protection Act (COPPA) question
 7. Session timeout should be 5 minute
-8. Choose &quot;No&quot; to the Children&#39;s Online Privacy Protection Act (COPPA) question
+8. Click "Next" and select the your preferred language
+9. Choose your preferred output voice
+10. leave "Intent classification confidence score threshold" at default 40% and click &quot;Done&quot;
 
-The form should now look as follows, noting that we&#39;re going to accept the default IAM role.
+## 1b Create an Intent
+An intent, which represents an action that the user wants to perform. For example, we&#39;re going to create a &quot;GetBalanceCheck&quot; intent in this lab;  (Afterwards you can follow the same process to create a separate intent for getting last transaction). It will allow user to check their account balance. This requires us to create custome slot to hold the account types.
+![slot panel](./images/banker-check-slotpanel.en.png)
+1. Create the custom slot for account types
+    - On the Lex Console, select the bot you created and click on "Slot types" on the left panel.
+    - Click on &quot;Add slots type&quot; and select *Add blank slot type* give it a name and click on **Add**
+    - On the panel that opens, select *Restrict to slot values* under **Slot value resolution**
+    - scroll down to **Slot type values** and add *Saving* and *Current* 
+![slot type](./images/slot-type.png)
+    - click on the **Save slot type** button to save your first custom slot
 
-![Create your Lex bot](images/Picture01.png)
+2. Create the GetBalanceCheck intent
+    - click on *Intents* on the left panel of the console, then click the *Add intent button*, select ***Add empty intent***
+    - add **GetBalanceCheck** as *Intent name* then click the *Add button*
+    - on the panel that opens, add an optional description
+    We now want to provide samples of what our user would type or say to perform this action (i.e. to activate this intent)
+    - sroll down to Sample utterances, switch to *Plain Text* and paste in the following utterances
+    ```Check my bank balance
+        how much money is in my account
+        how much money do i have
+        lexv2 accepts ulterance in the following formats:
+        What’s the balance in my {accountType} account ?
+        How much do I have in {accountType} ?
+    ```
+    - add additional ulterances as you chooses
+    ![sample ulterances](./images/ulterances.png)
 
-8. Click &quot;Create&quot;
-9. We will start by creating an intent, which represents an action that the user wants to perform. For example, we&#39;re going to create one intent in this lab for &quot;Get Balance Check&quot; ;  (If you have time afterwards you can create a separate intent for getting last transaction) Click the &quot;Create Intent&quot; button.
-10. In the window that pops-up click the &quot;Create intent&quot; link
+    Next we define a slot which is information we need to process the users request. This information can be included in the utterance (query) that the user types or says, and if not included, Lex will prompt the user for the information. While Lex includes many built-in slot types (such as number, colour, city, food, etc), we will use the custom slot we created earlier.
 
-![Add intent](images/Picture02.png)
+    - Scroll down to the Slots pane and click on the *Add slot* button
+    - ensure *Require for this intent* is checked
+    - provide **AccountType** as the name 
+    - click on *slot type* and select **AccountType** custom slot you created
+    - Enter "What type of account do you want to check (Current or Savings)? as prompt
 
-11. Our first intent enables the user to get account details, so name this intent &quot;GetBalanceCheck&quot; then click &quot;Add&quot;.
+    ![Add slot type](./images/slot.png)
+    - We are now going to ask a security follow up question and ask the user to enter their four digit pin number.
+    - follow the steps again to create another slot that will use one of the amazon in-built slots
+    - clicking the Add slot button, and this time use these values and then click the Add button:
 
-![Create intent](images/Picture03.png)
+    Name - PinNumber
+    Slot type - AMAZON.Number
+    Prompts - For verification purposes, what is your date of birth?
+    ![slot](./images/slotPin.png)
+    It is worth noting as you build other intents you can modify the order of the Slot collection (ie what questions get asked in which order) and also whether or not the slot is "Required" before passing the values to our external function.
+    - Scroll down and click &quot;Save Intent&quot;
 
-12. We now want to provide samples of what our user would type or say to perform this action (i.e. to activate this intent). Under &quot;Sample utterances&quot;, type the below phrases and hit [enter] or click the blue &quot;+&quot; sign after each phrase. Make sure you do not add a question mark at the end of the phrase as this will cause build issues later on.
+3. Let&#39;s build this simple Bot: Hit the grey Build button at the top right corner. You will be asked for confirmation to build. Click &quot;Build&quot;.
 
-- _Check my bank balance_
-- _how much money is in my account_
-- _how much money do i have_
+The build process takes approximately a minute. Once complete, click on **Test** just beside **Build**. you can ask your bot a question as a way to test it. For example, you could type &quot;what is my balance ?&quot; in the chat window, or click the microphone symbol, speak your request and client it again to have Lex translate your speech to text. At this stage since we have not added in the backend Lambda function, the response will be *intent fulfilled...*
 
-
-![Sample utterance](images/Picture04.png)
-
-13.  Next we define a slot which is information we need to process the users request. This information can be included in the utterance (query) that the user types or says, and if not included, Lex will prompt the user for the information. While Lex includes many built-in slot types (such as number, colour, city, food, etc), in this case we want to define a custom slot to get the account type that the user is referring to.
-
-Click on the blue &quot;+&quot; sign next to &quot;Slot types&quot; on the left hand side of the screen and select the &quot;Create slot type&quot; link - note, "Slot types" is initially greyed out, and on some laptop screens may not be obvious
-![Add slot type](images/Picture05b.png)
-
-14. Click create slot type
-![Add slot type](images/Picture05.png)
-
-14. For &#39;Slot type name&#39; enter &quot;AccountType&quot; and optionally enter a description (although description is not required)
-    
-15. Select restrict to Slot values and Synonyms
- 
-16. For Value, we want to allow the user to make queries against either their &quot;Saving&quot; or &quot;Current&quot; account so enter those as values, clicking the blue &quot;+&quot; sign after each word.
-
-![Create slot AccountType](images/Picture06b.png)
-
-16. Click &quot;Add slot to intent&quot;
-17. We now have to link the slot types to the Intent with additional information such as whether it is required or not and the prompt to use (ie how Lex will ask?) Enter 'What type of account do you have (current or saving?)'.
-
-	In the existing Slot list change the &quot;Name&quot; field from &quot;slotOne&quot; to &quot;AccountType&quot; so that it matches the slot name that we specified when we created the sample utterences.
-
-18. Specify &quot;What type of account do you want to check (Current or Savings)?&quot; for the &quot;Prompt&quot; field. This prompt will be used by our bot if the user does not specify an account type when asking a question.
-
-![Prompt for AccountType](images/Picture07.png)
-
-19.  We are now going to ask a security follow up question and ask the user to enter their four digit pin number.
-
-Add another slot and add the name as &quot;PinNumber&quot;.  Select the slot type AMAZON.FOUR_DIGIT_NUMBER and add the prompt as &quot;what is your pin number for your {AccountType} account&quot;. Ensure you click on the plus icon to add your new slot.
-
-![Prompt for AccountType](images/Picture08b.png)
-
-It is worth noting as you build other intents you can modify the order of the Slot collection (ie what questions get asked in which order) and also whether or not the slot is "Required" before passing the values to our external function.
-
-1.  Scroll down and click &quot;Save Intent&quot;
-
-If at any point you made a mistake in the steps above, selecting the &quot;Latest&quot; version of the intent at the top, next to the intent name, will allow you to edit your choices.
-
-21. Let&#39;s build this simple Bot: Hit the grey Build button at the top right corner. You will be asked for confirmation to build. Click &quot;Build&quot;.
-
-The build process takes approximately a minute. Once complete, you can ask your bot a question as a way to test it. For example, you could type &quot;what is my balance
-?&quot; in the chat window, or click the microphone symbol, speak your request and client it again to have Lex translate your speech to text. At this stage since we have not added in the backend Lambda function, the response will be that the bot is ready for fulfillment and will show you the values which will be transferred.
-<a name="testingthebot">
-
-![TestBot](images/Picture09-testbot.png).</a>
-
-22.  It is possible to give the user a simpler interface on the bot to multiple choice questions using Response Cards. If you click on the small cog icon next to the "AccountType" slot you get the option to add a "Prompt response card". Add a title "Select your card type" and add button title Saving Account (choose value Saving) and Current Account (value Current). Click &quot;Save&quot; and rebuild and test. You will now be presented with a multiple choice option select.
-
-![ResponseCard](images/Picture10-responsecard.png)
+![TestBot](./images/check-bot.png)
 
 # Step 2: Fulfilling the bot
 
