@@ -168,3 +168,6 @@ In this lab you have learned the basic operations to manage a Lex bot. First, yo
 
 # STEP 5. Integrating your bot into your website.
 Follow the steps in the documentation to integrate lex chat bot to your website using [komunicate](https://docs.kommunicate.io/docs/bot-lex-integration)
+
+# STEP 6. Deploy your website on AWS Amplify
+For a stet-by-step guild on how you can deploy your wesite on AWS Amplify, visit my other project in this [repository](https://github.com/chimezdev/WildRydes-serverless-app-AWS)
