@@ -79,7 +79,7 @@ The build process takes approximately a minute. Once complete, click on **Test**
 
 ![TestBot](./images/check-bot.png)
 
-# Step 2: Fulfilling the bot
+# Step 2: Fulfilling the bot 
 
 We are now in a position that we can transfer the answers to the 'slots' over to a function to perform logic and get a result for the user.
 
@@ -92,21 +92,22 @@ In the Lambda function we have hard-coded an Array of data but in a real world e
 3. On the &quot;Create function&quot; page, click the &quot;Author from scratch&quot; button
 4. Let&#39;s give our function the name of &quot;myPersonalBanker&quot; and optionally provide a description
 5. Choose Node.js 14.x as the Runtime
-6. We will &quot;Create new role from template – give it a Lex-style role name (such as &quot;LexRole&quot;) and select &quot;Test Harness permissions&quot; as the policy template.
+6. Click on **Change default execution role** to expand and select *Create a new role from AWS policy templates*
+7. We will &quot;Create new role from template – give it a Lex-style role name (such as &quot;LexRole&quot;)
+8. Under *Policy templates*, click and enter &quot;Test Harness permissions&quot; to select the policy template.
 
 
-![Author new Lambda function](images/Picture11.png)
+![Author new Lambda function](./images/lambda-role.png)
 
-1. Hit &quot;Create function&quot; on the bottom right and you&#39;ll be take to the &quot;Configuration&quot; window.  We are not adding any additional triggers, nor are we using Lambda Layers, so scroll down to the &quot;Function code&quot; section
-2. i) Open the lambda function code you will find [here](./myPersonalBanker_v1.js) (myPersonalBanker\_v1.js). Copy and paste the code into the inline editor – make sure that you overwrite any template code that is already in the code box
-    ii) Use this modified version of the lambda function [code](./myPersonalBanker_v2.js)
-3. Scroll down to the &#39;&quot;Execution role&quot; section and ensure that the role you created previously is selected in the &quot;Existing role&quot; drop-down – if not then please select it
-4.  Leave the rest unchanged, then hit the orange &quot;Save&quot; button at the top of the screen
+1. Hit &quot;Create function&quot; on the bottom right and you&#39;ll be taken to the &quot;Configuration&quot; window.  We are not adding any additional triggers, nor are we using Lambda Layers, so scroll down to the &quot;Function code&quot; section
+2. Open the lambda function code [myPersonalBanker_v2](./myPersonalBanker_v2.js) Copy and paste the code into the inline editor – make sure that you overwrite any template code that is already in the code box.
+3. NOTE: If you used a different intent name apart from "GetBalanceCheck", go to line 131 of the code and replace 'GetBalanceCheck' to your intent name.
+4. Leave the rest unchanged, then hit the grey &quot;Deploy&quot; button at the top of the screen
 
 # Step 3: Link the bot with the Lambda function
 - Linking lex bot v2 to our lambda function is slightly different compared to v1.
 
-In this step we will link the three intents we created to the Lambda function. We do this by providing the Lambda function as the method that contains the business logic used to &#39;fulfill&#39; the users requests. Once this is done (and the bot rebuilt), when a user specifies an intent (such as &#39;what is my checking account balance&#39;), Lex will call our Lambda function and pass it the intent name (&#39;GetAccountDetail&#39;) and the slot value (&#39;checking&#39;).
+In this step we will link the intents we created to the Lambda function. We do this by providing the Lambda function as the method that contains the business logic used to &#39;fulfill&#39; the users requests. Once this is done (and the bot rebuilt), when a user specifies an intent (such as &#39;what is my checking account balance&#39;), Lex will call our Lambda function and pass it the intent name (&#39;GetAccountDetail&#39;) and the slot value (&#39;checking&#39;).
 
 To do this, we go back to the [Lex Console](https://console.aws.amazon.com/lex).
 
@@ -127,12 +128,12 @@ To do this, we go back to the [Lex Console](https://console.aws.amazon.com/lex).
 ![Add Lambda permission](./images/banker-lambda-code-hooks.en.png)
 
 5. Click &quot;Save intent&quot;
-6. Repeat the above steps **3, 4 and 5** for intents &quot;GetLoanDetail&quot; and &quot;GetLoanProducts&quot;
-7. Click &quot;Build&quot; and then click &quot;Build&quot; again on the confirmation screen.
+6. Click &quot;Build&quot; and then click &quot;Build&quot; again on the confirmation screen.
 
 # Step 4: Running and debugging the bot
 
 1. If you now test the bot as you did at the bottom of [Step 1](#testingthebot) you will see a sample response back from the lambda function. This function has been setup to show you how a very basic flow can be configured and over the next few steps we will modify the code to make the function more helpful.
+![bot response](./images/bot-chat.png)
 
 The function 'closes' the Lex box with a message displaying the values passed into the slot. If you look within the Javascript for the function named 'simpleResponse' you should be able to see it does very little other than return data back to the user.
 
@@ -164,3 +165,6 @@ If you modify the lambda function and look for the line **'return balanceIntentE
 In this lab you have learned the basic operations to manage a Lex bot. First, you created a bot, then you defined intents and slot types. Finally you defined a Lambda function and attached it to your chatbot.
 
 **NOTE We will be continuing on from this Lab in the second Lab so please do not delete the Lex Bot you have created in this exercise.**
+
+# STEP 5. Integrating your bot into your website.
+Follow the steps in the documentation to integrate lex chat bot to your website using [komunicate](https://docs.kommunicate.io/docs/bot-lex-integration)
