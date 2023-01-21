@@ -5,7 +5,7 @@ const accounts = [
   {
     type: 'current',
     pinNumber: '1234',
-    balance: '134.12',
+    balance: '480',
   },
   {
     type: 'saving',
@@ -187,15 +187,6 @@ const confirmIntent = (sessionAttributes, intentName, slots, message) => ({
     message,
   },
 });
-
-// const close = (sessionAttributes, fulfillmentState, message) => ({
-//   sessionAttributes,
-//   dialogAction: {
-//     type: 'Close',
-//     fulfillmentState,
-//     message,
-//   },
-// });
 
 const delegate = (sessionAttributes, slots) => ({
   sessionAttributes,
